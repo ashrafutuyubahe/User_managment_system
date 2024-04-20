@@ -1,0 +1,116 @@
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+  }
+
+  #container {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    position: absolute;
+    top: 40px;
+    left: 30px;
+    margin-bottom: 40px;
+  }
+
+  #formcontainer {
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  .deletebtn,
+  #add,
+  .changebtn,
+  #createbtn,
+  #updatebtn,
+  button[type="button"] {
+    background-color: green;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  #name,
+  #email,
+  #newname,
+  #newemail {
+    width: calc(100% - 22px);
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+
+  #create,
+  #update {
+    margin-top: 20px;
+  }
+
+  #createbtn,
+  #updatebtn {
+    width: 120px;
+  }
+  body {
+    background-color: #ccc;
+    /* background-image: url('./img2.webp');
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh; */
+  }
+
+  #background {
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+  }
+  #datasearched {
+    background-color: rgb(180, 190, 180);
+  }
+  #see {
+   
+   background-color: aqua;
+
+  }
+  h6 {
+    float: right;
+    position: relative;
+    top: 30px;
+    left: 10px;
+  }
+  a {
+    list-style-type: none;
+    text-decoration: none;
+  }
+  #links button {
+    position: relative;
+    left: 260px;
+  }

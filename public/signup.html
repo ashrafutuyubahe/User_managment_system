@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+ 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+nav{
+  
+    height: 40px;
+    background-color: rgb(48, 96, 1);
+    width: 50%;
+    
+
+
+}
+#see{
+    float: right;
+    margin: 3px;
+}
+  </style>
+</head>
+<body>
+<nav>
+    <div class="input-group">
+    <input type="text" class="form-control" placeholder="Search..." id="see">
+  
+  </div>
+  
+</nav>
+  <div>
+    
+    <div id="searcheddata"></div>
+  </div>
+  <div id="container">
+    <div id="formcontainer">
+      <button id="add">ADD CLIENT+</button>
+      <form id="create">
+        <input type="text" placeholder="Client Name" id="name" />
+        <input type="text" placeholder="Email" id="email" />
+        <button type="submit" id="createbtn">CREATE</button>
+      </form>
+      <form id="update">
+        <input type="text" placeholder="New Client name" id="newname" />
+        <input type="text" placeholder="New Email" id="newemail" />
+        <button type="button" id="updatebtn">UPDATE</button>
+      </form>
+      <table id="table">
+        <tr>
+          <th>Client Name</th>  
+          <th>Email</th>
+          <th>Action</th>     
+        </tr>
+      </table>
+      <div id="pagination"></div>
+    </div>
+  </div>
+    <script>
+      $(document).ready(function () {
+        $("#update").hide();
+        $("#create").hide();
+        insert();
+        retrieve();
+        search();
+      });
+          
+      function insert() {
+        $("#formcontainer").on("click", "#add", function () {
+          $("#create").show();
+        });
+
+        $("#create").submit(function (event) {
+          event.preventDefault();
+          let username = $("#name").val();
+          let email = $("#email").val();
+          $.ajax({
+            type: "POST",
+            url: "insert.php",
+            data: {
+              name: username,
+              email: email,
+            },
+            success: function (data) {
+              retrieve();
+            },
+            error: function (error) {
+              console.log("Error occurred", error);
+            },
+          });
+          $("#create").hide();
+        });
+      }
+
+      function retrieve(pageNumber = 1) {
+        $.ajax({
+          type: "GET",
+          dataType: "json",
+          url: "insert.php?page=" + pageNumber,
+          success: function (data) {
+            displayData(data);
+            displayPagination(pageNumber);
+          },
+        });
+      }
+
+      function displayData(data) {
+        let tableHtml = "";
+        tableHtml += `<tr>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>`;
+        $.each(data, function (index, item) {
+          tableHtml += `<tr>
+                        <td>${item.User_Name}</td>
+                        <td>${item.Email}</td>
+                        <td>
+                            <button onclick="showUpdateForm(${item.id})" class="changebtn" data-id="${item.id}">Edit</button>
+                            <button onclick="deleteUser(${item.id})" class="deletebtn" data-id="${item.id}">Delete</button>
+                        </td>
+                    </tr>`;
+        });
+        $("#table").html(tableHtml);
+      }
+
+      function showUpdateForm(id) {
+        $("#update").show();
+        $("#updatebtn").data("userid", id);
+      }
+
+      $("#updatebtn").click(function () {
+        updateuser();
+      });
+
+      function updateuser() {
+        let id = $("#updatebtn").data("userid");
+        let usernm = $("#newname").val();
+        let email = $("#newemail").val();
+
+        $.ajax({
+          type: "PUT",
+          url: "insert.php",
+          data: {
+            username: usernm,
+            email: email,
+            id: id,
+          },
+          success: function (data) {
+            retrieve();
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+        $("#update").hide();
+      }
+
+      function deleteUser(id) {
+        $.ajax({
+          type: "DELETE",
+          url: "insert.php",
+          data: {
+            id: id,
+          },
+          success: function (data) {
+            retrieve();
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
+
+      function search() {
+        $("#see").keyup(function () {
+          let searched = $("#see").val();
+
+          $.ajax({
+            type: "post",
+            url: "search.php",
+            data: {
+              searched: searched,
+            },
+            success: function (data) {
+              if (data.length > 0) {
+                displayData(data);
+              } else {
+                $("#table").html('<tr><td colspan="3">No data found</td></tr>');
+              }
+            },
+            error: function (error) {
+              console.log("ERROR OCCURRED ", error);
+            },
+          });
+        });
+
+        $("#see").focus(function () {
+          $("#searchMessage").text("");
+        });
+
+        $("body").on("click", function () {
+          $("#searchMessage").text("");
+        });
+      }
+
+      function displayPagination(pageNumber) {
+        let paginationHtml = "";
+        let currentPage = pageNumber;
+
+        paginationHtml += `<button onclick="getPage(1)">First</button>`;
+        paginationHtml += `<button onclick="getPage(${
+          currentPage - 1
+        })">Previous</button>`;
+        paginationHtml += `<button onclick="getPage(${
+          currentPage + 1
+        })">Next</button>`;
+        $("#pagination").html(paginationHtml);
+      }
+
+      function getPage(pageNumber) {
+        retrieve(pageNumber);
+      }
+    </script>
+  </body>
+</html>

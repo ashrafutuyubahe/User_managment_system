@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management</title>
+    <script src="jquery-3.7.1.min.js"></script>
+
+    <style>
+      body {
+        background-color: #d2d0d0;
+        font-family: Arial, sans-serif;
+      }
+
+      #container {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #fff;
+      }
+
+      #formcontainer {
+        margin-bottom: 20px;
+        padding: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      .deletebtn,
+      #add,
+      .changebtn,
+      #createbtn,
+      #updatebtn,
+      button[type="button"] {
+        background-color: green;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+
+      #name,
+      #email,
+      #newname,
+      #newemail {
+        width: calc(100% - 22px);
+        margin-bottom: 10px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+
+      #create,
+      #update {
+        margin-top: 20px;
+      }
+
+      #createbtn,
+      #updatebtn {
+        width: 120px;
+      }
+      body{
+        background-color: #ccc;
+       /* background-image: url('./img2.webp');  */
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 100vh;
+        
+        
+       
+      }
+      #data{
+        position: relative;
+        bottom: 20px;
+        padding-top: 200px;
+        
+        font-size: 20px;
+      }
+      
+      /* /* #background{
+        background-repeat: no-repeat;
+        background-size: cover;        
+        height: 100vh; 
+        
+        
+      } */
+    </style>
+  </head>
+  <body >
+ <input type="text" placeholder="search..."id="search" >
+ <div id="data">
+ </div>
+    
+    
+    <div id="container">
+      <div id="formcontainer">
+        <button id="add">ADD CLIENT+</button>
+        <form id="create">
+          <input type="text" placeholder="  Client Name" id="name" />
+          <input type="text" placeholder="Email" id="email" />
+          <button type="submit" id="createbtn">CREATE</button>
+        </form>
+        <form id="update">
+          <input type="text" placeholder="New Client name" id="newname" />
+          <input type="text" placeholder="New Email" id="newemail" />
+          <button type="button" id="updatebtn">UPDATE</button>
+        </form>
+        <table id="table">
+          <tr>
+            <th>Client Name</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!-- <div id="data">
+      <p>
+        At our core, we are driven by a profound commitment to empower
+        businesses with the tools and strategies needed to foster meaningful
+        connections with their users. We understand that every interaction
+        matters and that the key to sustainable growth lies in nurturing
+        relationships built on trust and reliability. With our comprehensive
+        suite of solutions, we aim to simplify the complexities of user
+        management, offering tailored approaches that prioritize efficiency,
+        security, and personalized care. By equipping companies with the means
+        to understand and engage with their users effectively, we pave the way
+        for enhanced customer satisfaction, loyalty, and ultimately, greater
+        business success."
+      </p> -->
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#update").hide();
+        $("#create").hide();
+        insert();
+        retrieve();
+        search();
+      });
+    
+      function insert() {
+        $("#formcontainer").on("click", "#add", function () {
+          $("#create").show();
+        });
+    
+        $("#create").submit(function (event) {
+          event.preventDefault();
+          let username = $("#name").val();
+          let email = $("#email").val();
+          $.ajax({
+            type: "POST",
+            url: "insert.php",
+            data: {
+              name: username,
+              email: email,
+            },
+            success: function (data) {
+              retrieve();
+            },
+            error: function (error) {
+              console.log("Error occurred", error);
+            },
+          });
+          $("#create").hide();
+        });
+      }
+    
+      function retrieve() {
+        $.ajax({
+          type: "GET",
+          dataType: "json",
+          url: "insert.php",
+          success: function (data) {
+            displayData(data); // Display data received from PHP script
+            displayPagination(data.totalPages); // Display pagination based on total pages
+          },
+        });
+      }
+    
+      function displayData(data) {
+        let tableHtml = "";
+        tableHtml += `<tr>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>`;
+        $.each(data, function (index, item) {
+          tableHtml += `<tr>
+                        <td>${item.User_Name}</td>
+                        <td>${item.Email}</td>
+                        <td>
+                            <button onclick="showUpdateForm(${item.id})" class="changebtn" data-id="${item.id}">Edit</button>
+                            <button onclick="deleteUser(${item.id})" class="deletebtn" data-id="${item.id}">Delete</button>
+                        </td>
+                    </tr>`;
+        });
+        $("#table").html(tableHtml);
+      }
+    
+      function showUpdateForm(id) {
+        $("#update").show();
+        $("#updatebtn").data("userid", id);
+      }
+    
+      $("#updatebtn").click(function () {
+        updateuser();
+      });
+    
+      function updateuser() {
+        let id = $("#updatebtn").data("userid");
+        let usernm = $("#newname").val();
+        let email = $("#newemail").val();
+    
+        $.ajax({
+          type: "PUT",
+          url: "insert.php",
+          data: {
+            username: usernm,
+            email: email,
+            id: id,
+          },
+          success: function (data) {
+            retrieve();
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+        $("#update").hide();
+      }
+    
+      function deleteUser(id) {
+        $.ajax({
+          type: "DELETE",
+          url: "insert.php",
+          data: {
+            id: id,
+          },
+          success: function (data) {
+            retrieve();
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
+    
+      function search() {
+        $("#see").keyup(function () {
+          let searched = $("#see").val();
+    
+          $.ajax({
+            type: "post",
+            url: "search.php",
+            data: {
+              searched: searched,
+            },
+            success: function (data) {
+              displayData(data);
+            },
+            error: function (error) {
+              console.log("ERROR OCCURRED ", error);
+            },
+          });
+        });
+      }
+    
+      function pagination() {
+    $.ajax({
+        type: "GET",
+        url: "pagination.php",
+        success: function (data) {
+            var totalPages = parseInt(data);
+            localStorage.setItem("totalPages", totalPages); // Store total pages in localStorage for later use
+            displayPagination();
+        },
+        error: function (error) {
+            console.log("Error fetching pagination data");
+        }
+    });
+}
+
+function displayPagination() {
+    var totalPages = localStorage.getItem("totalPages");
+    var paginationContainer = $("#pagination");
+
+    for (var i = 1; i <= totalPages; i++) {
+        var pageButton = $("<button>").text(i);
+        pageButton.click(function () {
+            
+        });
+        paginationContainer.append(pageButton);
+    }
+}
+    </script>
+    
+  </body>
+</html>
