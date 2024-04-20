@@ -1,4 +1,5 @@
 <?php
+session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     include_once 'connection.php';
 
@@ -15,6 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $storedPassword = $row['password'];
 
         if ($storedPassword == $password) {
+           $_SESSION['id']=$_POST['id'];
+           $_SESSION['username']=$_POST['username'];
+           $_SESSION['userpassword']=$_POST['userpassword'];
+
+
             echo "<script>alert('You are logged in');</script>";
             header('Location: homepage.html');
             exit;
