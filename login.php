@@ -70,7 +70,27 @@
         <input type="submit" value="Login" />
       </form>
     </div>
+<?php
 
+if($_SERVER['REQUEST_METHOD']=='post' ){
+  include_once 'connection.php';
+  $password= $_POST['userpassword'];
+  $email= $_POST['useremail'];
+
+  $retrievedPassword="SELECT password FROM users where email='$email'";
+  $result= mysqli_query($conn,$retrievedPassword);
+  if(!$result){
+    echo "failed to retrieve password";
+  }
+  if($retrievedPassword==$password){
+    echo "<script>alert(' you are logged in');</script>"; 
+  
+}
+echo "<script>alert('invalid email or password.please use correct credentials');</script>"; 
+}
+echo "Invalid request method. Please try again.";
+
+?>
     
   </body>
 </html>
